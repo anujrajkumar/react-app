@@ -11,6 +11,12 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "Hello World"
+      Write-Host "Hello World"
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
