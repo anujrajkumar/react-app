@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_anujrajkumar_react_app_1704192667481-pr-trigger-input-set
+  identifier: Build_anujrajkumar_react_app_1704192667481prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_anujrajkumar_react_app_1704192667481
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
