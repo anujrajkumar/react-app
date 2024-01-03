@@ -29,9 +29,11 @@ pipeline:
                   identifier: npmtest
                   name: npm_test
                   spec:
+                    shell: Powershell
                     command: npm run test
                   timeout: ""
                   type: Run
+                  description: Running the Test
           platform:
             os: Windows
             arch: Amd64
