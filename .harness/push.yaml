@@ -1,0 +1,14 @@
+inputSet:
+  name: push
+  identifier: push
+  orgIdentifier: default
+  projectIdentifier: demo
+  pipeline:
+    identifier: demo
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
