@@ -35,10 +35,10 @@ pipeline:
                   type: Run
                   description: Running the Test
           platform:
-            os: Windows
+            os: Linux
             arch: Amd64
           runtime:
-            type: Docker
+            type: Cloud
             spec: {}
         type: CI
         delegateSelectors:
