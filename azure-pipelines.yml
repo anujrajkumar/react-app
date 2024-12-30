@@ -17,6 +17,7 @@ steps:
     script: |
       echo 'Hello world'
       ls
+      docker --version
 - task: AzureCLI@2
   inputs:
     azureSubscription: 'Free Trial(bf36d252-0a2c-4753-9a43-68a202eecd31)'
