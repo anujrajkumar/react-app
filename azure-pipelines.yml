@@ -8,7 +8,7 @@ trigger:
 - master
 
 pool:
-  vmImage: ubuntu-latest
+  name: vmss-demo
 
 steps:
 - task: PowerShell@2
