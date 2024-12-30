@@ -11,12 +11,12 @@ pool:
   name: vmss-demo
 
 steps:
-- task: PowerShell@2
+- task: Bash@3
   inputs:
     targetType: 'inline'
     script: |
-      Write-Host "Hello World"
-      Write-Host "Hello World"
+      echo 'Hello world'
+      ls
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
