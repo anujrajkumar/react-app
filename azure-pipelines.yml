@@ -21,7 +21,7 @@ steps:
 - task: AzureCLI@2
   inputs:
     azureSubscription: 'Free Trial(bf36d252-0a2c-4753-9a43-68a202eecd31)'
-    scriptType: 'batch'
+    scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: 'az account show'
 # - task: NodeTool@0
