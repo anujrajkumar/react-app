@@ -18,6 +18,7 @@ steps:
       echo 'Hello world'
       ls
       docker --version
+      kubectl
       helm
       az
 - task: AzureCLI@2
