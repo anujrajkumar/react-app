@@ -18,6 +18,7 @@ steps:
       echo 'Hello world'
       ls
       docker --version
+      helm
       az
 - task: AzureCLI@2
   inputs:
