@@ -8,7 +8,7 @@ trigger:
 - master
 
 pool:
-  name: vmss-demo
+  name: demo-vmss
 
 steps:
 - task: Bash@3
