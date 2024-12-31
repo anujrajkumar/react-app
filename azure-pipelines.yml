@@ -18,6 +18,8 @@ steps:
       echo 'Hello world'
       ls
       docker --version
+      docker pull ngnix
+      docker images
       kubectl
       helm
       az
@@ -27,6 +29,7 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: 'az account show'
+
 # - task: NodeTool@0
 #   inputs:
 #     versionSpec: '10.x'
