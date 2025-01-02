@@ -14,8 +14,8 @@ pr:
     include:
       - '*'
 
-pool:
-  name: demo-vmss
+  pool:
+    vmImage: 'ubuntu-latest'
 
 steps:
 - task: Bash@3
