@@ -1,0 +1,66 @@
+## Node.js with React
+# Build a Node.js project that uses React.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+#test
+
+trigger:
+- none
+
+# pr:
+#   branches:
+#     include:
+#       - '*'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo 'Hello world'
+      ls
+      docker --version
+      kubectl
+      helm
+      az
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Free Trial(bf36d252-0a2c-4753-9a43-68a202eecd31)'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az account show'
+
+# - task: NodeTool@0
+#   inputs:
+#     versionSpec: '10.x'
+#   displayName: 'Install Node.js'
+
+# - script: |
+#     npm install
+#     npm run build
+#   displayName: 'npm install and build'
+
+# - task: CopyFiles@2
+#   displayName: 'Copy files'
+#   inputs:
+#     sourceFolder: '$(System.DefaultWorkingDirectory)/build' 
+#     Contents: '**/*'
+#     TargetFolder: '$(Build.ArtifactStagingDirectory)'
+#     cleanTargetFolder: true
+
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build'
+#     includeRootFolder: false
+#     archiveType: 'zip'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+#     replaceExistingArchive: true
+
+# - task: PublishPipelineArtifact@1
+#   inputs:
+#         targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+#         artifact: 'reactapp'
+#         publishLocation: 'pipeline'
