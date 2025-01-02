@@ -9,10 +9,10 @@ trigger:
     include:
       - '*'
 
-# pr:
-#   branches:
-#     include:
-#       - '*'
+pr:
+  branches:
+    include:
+      - '*'
 
 pool:
   name: demo-vmss
