@@ -5,7 +5,14 @@
 #test
 
 trigger:
-- master
+  branches:
+    include:
+      - '*'
+
+pr:
+  branches:
+    include:
+      - '*'
 
 pool:
   name: demo-vmss
