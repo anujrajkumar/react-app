@@ -5,7 +5,9 @@
 #test
 
 trigger:
-- none
+  branches:
+    include:
+      - '*'
 
 # pr:
 #   branches:
