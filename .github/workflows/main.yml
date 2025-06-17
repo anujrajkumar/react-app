@@ -23,5 +23,7 @@ jobs:
           
       - name: Second Composite Action
         uses: anujrajkumar/template/custom2@main
+        with:
+          run_condition: 'true'
           
       - run: echo "This is invalid"
