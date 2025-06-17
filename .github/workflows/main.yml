@@ -16,11 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: foo
+      - name: First Composite Action
         uses: anujrajkumar/template/custom@main
         with:
           run_condition: 'true'
           
       - name: Second Composite Action
-        uses: anujrajkumar/template/custom2/action.yaml@main
+        uses: anujrajkumar/template/custom2@main
           
       - run: echo "This is invalid"
