@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: foo
-        uses: anujrajkumar/template@main
+        uses: anujrajkumar/template/custom@main
         with:
           run_condition: 'true'
           
