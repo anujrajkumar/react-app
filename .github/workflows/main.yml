@@ -1,0 +1,14 @@
+on: [push]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to say hello
+    steps:
+      - uses: actions/checkout@v4
+      - id: foo
+        uses: Template/blob/main/.github/workflows/custom.yaml@main
+        with:
+          run_condition: 'true'
+          
+      - run: echo "This is invalid"
