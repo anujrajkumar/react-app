@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: foo
-        uses: anujrajkumar/Template/.github/workflows/custom.yaml@main
+        uses: anujrajkumar/Template/.github/action/custom.yaml@main
         with:
           run_condition: 'true'
           
