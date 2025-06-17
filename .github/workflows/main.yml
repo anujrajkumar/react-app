@@ -20,4 +20,8 @@ jobs:
         with:
           run_condition: 'true'
           
+        uses: anujrajkumar/template/custom/new.yaml@main
+        with:
+          run_condition: 'true'
+          
       - run: echo "This is invalid"
