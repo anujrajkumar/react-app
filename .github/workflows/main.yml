@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: foo
-        uses: anujrajkumar/Template/.github/action@main
+        uses: anujrajkumar/template/.github/actions/custom@main
         with:
           run_condition: 'true'
           
