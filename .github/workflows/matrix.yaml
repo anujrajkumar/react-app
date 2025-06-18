@@ -40,14 +40,12 @@ jobs:
             endpointName: "prod-endpoint"
             domainName: "prod.domain.com"
 
-    if: |
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
-      (github.event_name == 'push' && github.ref_name == matrix.branch)
-    uses: anujrajkumar/template/.github/workflows/new.yaml@main
-    with:
-      environment: ${{ matrix.env }}
-      storageAccountName: ${{ matrix.storageAccountName }}
-    secrets: inherit
+    steps:
+      - name: Conditional Build & Upload
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
+          (github.event_name == 'push' && github.ref_name == matrix.branch)
+        uses: anujrajkumar/template/.github/workflows/new.yaml@main
 
   cleanup:
     needs: build-and-upload
@@ -76,7 +74,9 @@ jobs:
             endpointName: "prod-endpoint"
             domainName: "prod.domain.com"
 
-    if: |
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
-      (github.event_name == 'push' && github.ref_name == matrix.branch)
-    uses: anujrajkumar/template/.github/workflows/blank.yml@main
+    steps:
+      - name: Conditional Build & Upload
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
+          (github.event_name == 'push' && github.ref_name == matrix.branch)
+        uses: anujrajkumar/template/.github/workflows/blank.yml@main
