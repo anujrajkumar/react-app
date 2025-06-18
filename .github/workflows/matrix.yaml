@@ -1,68 +1,57 @@
-name: Deploy FE App Pipeline
+name: Callback Frontend Deploy Pipeline
 
 on:
-  workflow_dispatch:   # Manual trigger
+  workflow_dispatch:
     inputs:
       branch:
-        description: "Select branch to deploy (master, master2, master3)"
+        description: "Target branch"
         required: true
-        default: "master"
-  push:                # Auto trigger on push
+        type: string
+  push:
     branches:
       - master
       - master2
       - master3
 
 jobs:
-  deploy:
+  set-matrix:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          echo '{
+            "include": [
+              { "env": "dev", "branch": "master", "storageAccountName": "devstorageaccount", "frontdoorName": "dev-frontdoor", "frontdoorRG": "dev-rg", "endpointName": "dev-endpoint", "domainName": "dev.domain.com" },
+              { "env": "staging", "branch": "master2", "storageAccountName": "stagingstorageaccount", "frontdoorName": "staging-frontdoor", "frontdoorRG": "staging-rg", "endpointName": "staging-endpoint", "domainName": "staging.domain.com" },
+              { "env": "prod", "branch": "master3", "storageAccountName": "prodstorageaccount", "frontdoorName": "prod-frontdoor", "frontdoorRG": "prod-rg", "endpointName": "prod-endpoint", "domainName": "prod.domain.com" }
+            ]
+          }' > matrix.json
+          echo "matrix=$(cat matrix.json)" >> $GITHUB_OUTPUT
+
+  build-upload:
+    needs: set-matrix
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == fromJson(needs.set-matrix.outputs.matrix).include[matrix.index].branch) ||
+      (github.event_name == 'push' && github.ref_name == fromJson(needs.set-matrix.outputs.matrix).include[matrix.index].branch)
     strategy:
-      matrix:
-        env: [dev, staging, production]
-        include:
-          - env: dev
-            branch: master
-            storageAccountName: "devstorageaccount"
-            frontdoorName: "dev-frontdoor"
-            frontdoorRG: "dev-rg"
-            endpointName: "dev-endpoint"
-            domainName: "dev.domain.com"
+      matrix: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
+    uses: anujrajkumar/template/.github/workflows/new.yaml@main
+    with:
+      storageAccountName: ${{ matrix.storageAccountName }}
+      sourcePath: 'dist'
 
-          - env: staging
-            branch: master2
-            storageAccountName: "stagingstorageaccount"
-            frontdoorName: "staging-frontdoor"
-            frontdoorRG: "staging-rg"
-            endpointName: "staging-endpoint"
-            domainName: "staging.domain.com"
-
-          - env: production
-            branch: master3
-            storageAccountName: "prodstorageaccount"
-            frontdoorName: "prod-frontdoor"
-            frontdoorRG: "prod-rg"
-            endpointName: "prod-endpoint"
-            domainName: "prod.domain.com"
-
-    # Core Logic: If it's manual, use workflow_dispatch.input.branch
-    # Otherwise (push), use github.ref_name
+  cleanup:
+    needs: build-upload
+    strategy:
+      matrix: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
     if: |
       (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
       (github.event_name == 'push' && github.ref_name == matrix.branch)
+    uses: anujrajkumar/template/.github/workflows/blank.yml@main
+    with:
+      storageAccountName: ${{ matrix.storageAccountName }}
 
-    steps:
-      - name: Print Deployment Info
-        run: |
-          echo "Running for Environment: ${{ matrix.env }}"
-          echo "On Branch: ${{ matrix.branch }}"
 
-      - name: Build & Upload
-        uses: anujrajkumar/template/.github/workflows/blank.yml@main
-        with:
-          storageAccountName: ${{ matrix.storageAccountName }}
-          app_name: ${{ matrix.env }}
 
-      - name: Cleanup Static Files
-        uses: anujrajkumar/template/.github/workflows/new.yaml@main
-        with:
-          storageAccountName: ${{ matrix.storageAccountName }}
