@@ -9,7 +9,7 @@ on:
       - master3
 
 jobs:
-  deploy:
+  build-and-upload:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,59 +18,70 @@ jobs:
           - env: dev
             branch: master
             storageAccountName: "devstorageaccount"
-            frontdoorName: "dev-frontdoor"
-            frontdoorRG: "dev-rg"
-            endpointName: "dev-endpoint"
-            domainName: "dev.domain.com"
 
           - env: staging
             branch: master2
             storageAccountName: "stagingstorageaccount"
-            frontdoorName: "staging-frontdoor"
-            frontdoorRG: "staging-rg"
-            endpointName: "staging-endpoint"
-            domainName: "staging.domain.com"
 
           - env: production
             branch: master3
             storageAccountName: "prodstorageaccount"
+
+    if: ${{ github.ref_name == matrix.branch }} # Skip job if branch doesn't match
+    steps:
+      - name: Build and Upload for ${{ matrix.env }}
+        run: |
+          echo "Building for ${{ matrix.env }} on branch ${{ github.ref_name }}"
+          echo "Using Storage Account: ${{ matrix.storageAccountName }}"
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: build-and-upload
+    strategy:
+      matrix:
+        env: [dev, staging, production]
+        include:
+          - env: dev
+            branch: master
+            frontdoorName: "dev-frontdoor"
+
+          - env: staging
+            branch: master2
+            frontdoorName: "staging-frontdoor"
+
+          - env: production
+            branch: master3
             frontdoorName: "prod-frontdoor"
-            frontdoorRG: "prod-rg"
-            endpointName: "prod-endpoint"
+
+    if: ${{ github.ref_name == matrix.branch }} # Skip if not matching
+    steps:
+      - name: Cleanup for ${{ matrix.env }}
+        run: |
+          echo "Cleaning for ${{ matrix.env }} on branch ${{ github.ref_name }}"
+          echo "Frontdoor Name: ${{ matrix.frontdoorName }}"
+
+  purge-frontdoor:
+    runs-on: ubuntu-latest
+    needs: cleanup
+    strategy:
+      matrix:
+        env: [dev, staging, production]
+        include:
+          - env: dev
+            branch: master
+            domainName: "dev.domain.com"
+
+          - env: staging
+            branch: master2
+            domainName: "staging.domain.com"
+
+          - env: production
+            branch: master3
             domainName: "prod.domain.com"
 
+    if: ${{ github.ref_name == matrix.branch }} # Skip if not matching
     steps:
-      - name: Check branch matches environment
-        if: github.ref_name == matrix.branch
+      - name: Purge Frontdoor Cache for ${{ matrix.env }}
         run: |
-          echo "Running for environment: ${MATRIX_ENV} on branch: ${GITHUB_REF_NAME}"
-        env:
-          MATRIX_ENV: ${{ matrix.env }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-
-      - name: Build and Upload (Only on matching branch)
-        if: github.ref_name == matrix.branch
-        run: |
-          echo "Building and uploading for environment: ${MATRIX_ENV}"
-          echo "Storage Account: ${{ matrix.storageAccountName }}"
+          echo "Purging Frontdoor for ${{ matrix.env }} on branch ${{ github.ref_name }}"
           echo "Domain Name: ${{ matrix.domainName }}"
-        env:
-          MATRIX_ENV: ${{ matrix.env }}
-
-      - name: Cleanup Old Files (Only on matching branch)
-        if: github.ref_name == matrix.branch
-        run: |
-          echo "Cleaning up for environment: ${MATRIX_ENV}"
-          echo "Frontdoor Name: ${{ matrix.frontdoorName }}"
-          echo "Endpoint Name: ${{ matrix.endpointName }}"
-        env:
-          MATRIX_ENV: ${{ matrix.env }}
-
-      - name: Purge Front Door Cache (Only on matching branch)
-        if: github.ref_name == matrix.branch
-        run: |
-          echo "Purging Front Door for environment: ${MATRIX_ENV}"
-          echo "Frontdoor RG: ${{ matrix.frontdoorRG }}"
-          echo "Domain Name: ${{ matrix.domainName }}"
-        env:
-          MATRIX_ENV: ${{ matrix.env }}
