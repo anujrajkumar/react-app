@@ -42,25 +42,35 @@ jobs:
     steps:
       - name: Check branch matches environment
         if: github.ref_name == matrix.branch
-        run: echo "Running for environment: ${{ matrix.env }} on branch: ${{ github.ref_name }}"
+        run: |
+          echo "Running for environment: ${MATRIX_ENV} on branch: ${GITHUB_REF_NAME}"
+        env:
+          MATRIX_ENV: ${{ matrix.env }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
 
-  build-and-upload:
-    needs: deploy
-    if: github.ref_name == matrix.branch
-    run: |
-      echo "${{ matrix.domainName }}"
-      echo "${{ matrix.endpointName }}"
+      - name: Build and Upload (Only on matching branch)
+        if: github.ref_name == matrix.branch
+        run: |
+          echo "Building and uploading for environment: ${MATRIX_ENV}"
+          echo "Storage Account: ${{ matrix.storageAccountName }}"
+          echo "Domain Name: ${{ matrix.domainName }}"
+        env:
+          MATRIX_ENV: ${{ matrix.env }}
 
-  cleanup:
-    needs: build-and-upload
-    if: github.ref_name == matrix.branch
-    run: |
-      echo "${{ matrix.domainName }}"
-      echo "${{ matrix.endpointName }}"
+      - name: Cleanup Old Files (Only on matching branch)
+        if: github.ref_name == matrix.branch
+        run: |
+          echo "Cleaning up for environment: ${MATRIX_ENV}"
+          echo "Frontdoor Name: ${{ matrix.frontdoorName }}"
+          echo "Endpoint Name: ${{ matrix.endpointName }}"
+        env:
+          MATRIX_ENV: ${{ matrix.env }}
 
-  purge-frontdoor:
-    needs: cleanup
-    if: github.ref_name == matrix.branch
-    run: |
-      echo "${{ matrix.domainName }}"
-      echo "${{ matrix.endpointName }}"
+      - name: Purge Front Door Cache (Only on matching branch)
+        if: github.ref_name == matrix.branch
+        run: |
+          echo "Purging Front Door for environment: ${MATRIX_ENV}"
+          echo "Frontdoor RG: ${{ matrix.frontdoorRG }}"
+          echo "Domain Name: ${{ matrix.domainName }}"
+        env:
+          MATRIX_ENV: ${{ matrix.env }}
