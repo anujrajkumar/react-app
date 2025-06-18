@@ -1,15 +1,20 @@
 name: Deploy FE App Pipeline
 
 on:
-  workflow_dispatch:
-  push:
+  workflow_dispatch:   # Manual trigger
+    inputs:
+      branch:
+        description: "Select branch to deploy (master, master2, master3)"
+        required: true
+        default: "master"
+  push:                # Auto trigger on push
     branches:
       - master
       - master2
       - master3
 
 jobs:
-  build-and-upload:
+  deploy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,70 +23,46 @@ jobs:
           - env: dev
             branch: master
             storageAccountName: "devstorageaccount"
-
-          - env: staging
-            branch: master2
-            storageAccountName: "stagingstorageaccount"
-
-          - env: production
-            branch: master3
-            storageAccountName: "prodstorageaccount"
-
-    if: ${{ github.ref_name == matrix.branch }} # Skip job if branch doesn't match
-    steps:
-      - name: Build and Upload for ${{ matrix.env }}
-        run: |
-          echo "Building for ${{ matrix.env }} on branch ${{ github.ref_name }}"
-          echo "Using Storage Account: ${{ matrix.storageAccountName }}"
-
-  cleanup:
-    runs-on: ubuntu-latest
-    needs: build-and-upload
-    strategy:
-      matrix:
-        env: [dev, staging, production]
-        include:
-          - env: dev
-            branch: master
             frontdoorName: "dev-frontdoor"
-
-          - env: staging
-            branch: master2
-            frontdoorName: "staging-frontdoor"
-
-          - env: production
-            branch: master3
-            frontdoorName: "prod-frontdoor"
-
-    if: ${{ github.ref_name == matrix.branch }} # Skip if not matching
-    steps:
-      - name: Cleanup for ${{ matrix.env }}
-        run: |
-          echo "Cleaning for ${{ matrix.env }} on branch ${{ github.ref_name }}"
-          echo "Frontdoor Name: ${{ matrix.frontdoorName }}"
-
-  purge-frontdoor:
-    runs-on: ubuntu-latest
-    needs: cleanup
-    strategy:
-      matrix:
-        env: [dev, staging, production]
-        include:
-          - env: dev
-            branch: master
+            frontdoorRG: "dev-rg"
+            endpointName: "dev-endpoint"
             domainName: "dev.domain.com"
 
           - env: staging
             branch: master2
+            storageAccountName: "stagingstorageaccount"
+            frontdoorName: "staging-frontdoor"
+            frontdoorRG: "staging-rg"
+            endpointName: "staging-endpoint"
             domainName: "staging.domain.com"
 
           - env: production
             branch: master3
+            storageAccountName: "prodstorageaccount"
+            frontdoorName: "prod-frontdoor"
+            frontdoorRG: "prod-rg"
+            endpointName: "prod-endpoint"
             domainName: "prod.domain.com"
 
-    if: ${{ github.ref_name == matrix.branch }} # Skip if not matching
+    # Core Logic: If it's manual, use workflow_dispatch.input.branch
+    # Otherwise (push), use github.ref_name
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
+      (github.event_name == 'push' && github.ref_name == matrix.branch)
+
     steps:
-      - name: Purge Frontdoor Cache for ${{ matrix.env }}
+      - name: Print Deployment Info
         run: |
-          echo "Purging Frontdoor for ${{ matrix.env }} on branch ${{ github.ref_name }}"
-          echo "Domain Name: ${{ matrix.domainName }}"
+          echo "Running for Environment: ${{ matrix.env }}"
+          echo "On Branch: ${{ matrix.branch }}"
+
+      - name: Build & Upload
+        uses: anujrajkumar/template/.github/workflows/blank.yml@main
+        with:
+          storageAccountName: ${{ matrix.storageAccountName }}
+          app_name: ${{ matrix.env }}
+
+      - name: Cleanup Static Files
+        uses: anujrajkumar/template/.github/workflows/new.yaml@main
+        with:
+          storageAccountName: ${{ matrix.storageAccountName }}
