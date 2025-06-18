@@ -1,12 +1,12 @@
-name: Callback Frontend Deploy Pipeline
+name: Callback Workflow with Matrix per Job
 
 on:
   workflow_dispatch:
     inputs:
       branch:
-        description: "Target branch"
+        description: 'Branch to deploy (master, master2, master3)'
         required: true
-        type: string
+        default: 'master'
   push:
     branches:
       - master
@@ -14,44 +14,69 @@ on:
       - master3
 
 jobs:
-  set-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - id: set-matrix
-        run: |
-          echo '{
-            "include": [
-              { "env": "dev", "branch": "master", "storageAccountName": "devstorageaccount", "frontdoorName": "dev-frontdoor", "frontdoorRG": "dev-rg", "endpointName": "dev-endpoint", "domainName": "dev.domain.com" },
-              { "env": "staging", "branch": "master2", "storageAccountName": "stagingstorageaccount", "frontdoorName": "staging-frontdoor", "frontdoorRG": "staging-rg", "endpointName": "staging-endpoint", "domainName": "staging.domain.com" },
-              { "env": "prod", "branch": "master3", "storageAccountName": "prodstorageaccount", "frontdoorName": "prod-frontdoor", "frontdoorRG": "prod-rg", "endpointName": "prod-endpoint", "domainName": "prod.domain.com" }
-            ]
-          }' > matrix.json
-          echo "matrix=$(cat matrix.json)" >> $GITHUB_OUTPUT
-
-  build-upload:
-    needs: set-matrix
-    if: |
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == fromJson(needs.set-matrix.outputs.matrix).include[matrix.index].branch) ||
-      (github.event_name == 'push' && github.ref_name == fromJson(needs.set-matrix.outputs.matrix).include[matrix.index].branch)
+  build-and-upload:
     strategy:
-      matrix: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
+      matrix:
+        include:
+          - env: dev
+            branch: master
+            storageAccountName: "devstorageaccount"
+            frontdoorName: "dev-frontdoor"
+            frontdoorRG: "dev-rg"
+            endpointName: "dev-endpoint"
+            domainName: "dev.domain.com"
+          - env: staging
+            branch: master2
+            storageAccountName: "stagingstorageaccount"
+            frontdoorName: "staging-frontdoor"
+            frontdoorRG: "staging-rg"
+            endpointName: "staging-endpoint"
+            domainName: "staging.domain.com"
+          - env: production
+            branch: master3
+            storageAccountName: "prodstorageaccount"
+            frontdoorName: "prod-frontdoor"
+            frontdoorRG: "prod-rg"
+            endpointName: "prod-endpoint"
+            domainName: "prod.domain.com"
+
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
+      (github.event_name == 'push' && github.ref_name == matrix.branch)
     uses: anujrajkumar/template/.github/workflows/new.yaml@main
     with:
+      environment: ${{ matrix.env }}
       storageAccountName: ${{ matrix.storageAccountName }}
-      sourcePath: 'dist'
+    secrets: inherit
 
   cleanup:
-    needs: build-upload
+    needs: build-and-upload
     strategy:
-      matrix: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
+      matrix:
+        include:
+          - env: dev
+            branch: master
+            storageAccountName: "devstorageaccount"
+            frontdoorName: "dev-frontdoor"
+            frontdoorRG: "dev-rg"
+            endpointName: "dev-endpoint"
+            domainName: "dev.domain.com"
+          - env: staging
+            branch: master2
+            storageAccountName: "stagingstorageaccount"
+            frontdoorName: "staging-frontdoor"
+            frontdoorRG: "staging-rg"
+            endpointName: "staging-endpoint"
+            domainName: "staging.domain.com"
+          - env: production
+            branch: master3
+            storageAccountName: "prodstorageaccount"
+            frontdoorName: "prod-frontdoor"
+            frontdoorRG: "prod-rg"
+            endpointName: "prod-endpoint"
+            domainName: "prod.domain.com"
+
     if: |
       (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
       (github.event_name == 'push' && github.ref_name == matrix.branch)
     uses: anujrajkumar/template/.github/workflows/blank.yml@main
-    with:
-      storageAccountName: ${{ matrix.storageAccountName }}
-
-
-
