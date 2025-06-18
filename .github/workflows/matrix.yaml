@@ -1,0 +1,66 @@
+name: Deploy FE App Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - master2
+      - master3
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [dev, staging, production]
+        include:
+          - env: dev
+            branch: master
+            storageAccountName: "devstorageaccount"
+            frontdoorName: "dev-frontdoor"
+            frontdoorRG: "dev-rg"
+            endpointName: "dev-endpoint"
+            domainName: "dev.domain.com"
+
+          - env: staging
+            branch: master2
+            storageAccountName: "stagingstorageaccount"
+            frontdoorName: "staging-frontdoor"
+            frontdoorRG: "staging-rg"
+            endpointName: "staging-endpoint"
+            domainName: "staging.domain.com"
+
+          - env: production
+            branch: master3
+            storageAccountName: "prodstorageaccount"
+            frontdoorName: "prod-frontdoor"
+            frontdoorRG: "prod-rg"
+            endpointName: "prod-endpoint"
+            domainName: "prod.domain.com"
+
+    steps:
+      - name: Check branch matches environment
+        if: github.ref_name == matrix.branch
+        run: echo "Running for environment: ${{ matrix.env }} on branch: ${{ github.ref_name }}"
+
+  build-and-upload:
+    needs: deploy
+    if: github.ref_name == matrix.branch
+    run: |
+      echo "${{ matrix.domainName }}"
+      echo "${{ matrix.endpointName }}"
+
+  cleanup:
+    needs: build-and-upload
+    if: github.ref_name == matrix.branch
+    run: |
+      echo "${{ matrix.domainName }}"
+      echo "${{ matrix.endpointName }}"
+
+  purge-frontdoor:
+    needs: cleanup
+    if: github.ref_name == matrix.branch
+    run: |
+      echo "${{ matrix.domainName }}"
+      echo "${{ matrix.endpointName }}"
