@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ env.BUILD_NUMBER }}
-          path: ${{ github.workspace }}/dist/**
+          path: ${{ github.workspace }}/dist
           retention-days: 2
 
   downlaod:
@@ -53,4 +53,5 @@ jobs:
       - name: List
         run: |
           ls -ltr
+          cd dist/p-one-ad-b2c-test/browser
           cat new.txt
