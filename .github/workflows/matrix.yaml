@@ -53,5 +53,5 @@ jobs:
       - name: List
         run: |
           ls -ltr
-          cd dist/p-one-ad-b2c-test/browser
+          cd dist/p-one-ad-b2c-test/browser/
           cat new.txt
