@@ -35,6 +35,7 @@ jobs:
           retention-days: 2
 
   downlaod:
+    needs: build-and-upload 
     runs-on: ubuntu-latest
     name: Download
     env:
