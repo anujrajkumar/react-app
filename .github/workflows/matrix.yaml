@@ -14,6 +14,7 @@ on:
 
 jobs:
   build-and-upload:
+    if: ${{ github.ref_name == 'master' }}
     runs-on: ubuntu-latest
     name: A job to say hello
     env:
@@ -57,6 +58,7 @@ jobs:
 
   downlaod:
     needs: build-and-upload 
+    if: ${{ github.ref_name != 'master' }}
     runs-on: ubuntu-latest
     name: Download
     env:
