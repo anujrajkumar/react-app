@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Download
     env:
-      BUILD_NUMBER: ${{ github.workspace }}/dist/p-one-ad-b2c-test/browser
+      BUILD_NUMBER: ${{ github.run_number }}
       
     steps:
       - uses: actions/checkout@v4
@@ -48,7 +48,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: artifact-${{ env.BUILD_NUMBER }}
-          path:  ${{ github.workspace }}
+          path:  ${{ github.workspace }}/dist/p-one-ad-b2c-test/browser
 
       - name: List
         run: |
