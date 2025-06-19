@@ -1,5 +1,7 @@
 name: Callback Workflow with Matrix per Job
 
+env:
+  GLOBAL_VAR: "I am available everywhere"
 on:
   workflow_dispatch:
     inputs:
@@ -27,6 +29,7 @@ jobs:
         run: |
           echo "Setting deployment start time..."
           echo "deploy_start_time=$(date -u +%s)" >> $GITHUB_OUTPUT
+          echo "$GLOBAL_VAR"
 
       - name: Set deployment start time
         id: time
