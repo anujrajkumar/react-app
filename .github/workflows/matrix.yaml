@@ -10,73 +10,44 @@ on:
   push:
     branches:
       - master
-      - master2
-      - master3
+
 
 jobs:
   build-and-upload:
-    strategy:
-      matrix:
-        include:
-          - env: dev
-            branch: master
-            storageAccountName: "devstorageaccount"
-            frontdoorName: "dev-frontdoor"
-            frontdoorRG: "dev-rg"
-            endpointName: "dev-endpoint"
-            domainName: "dev.domain.com"
-          - env: staging
-            branch: master2
-            storageAccountName: "stagingstorageaccount"
-            frontdoorName: "staging-frontdoor"
-            frontdoorRG: "staging-rg"
-            endpointName: "staging-endpoint"
-            domainName: "staging.domain.com"
-          - env: production
-            branch: master3
-            storageAccountName: "prodstorageaccount"
-            frontdoorName: "prod-frontdoor"
-            frontdoorRG: "prod-rg"
-            endpointName: "prod-endpoint"
-            domainName: "prod.domain.com"
-
+    runs-on: ubuntu-latest
+    name: A job to say hello
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      
     steps:
-      - name: Conditional Build & Upload
-        if: |
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
-          (github.event_name == 'push' && github.ref_name == matrix.branch)
-        uses: anujrajkumar/template/.github/workflows/new.yaml@main
+      - uses: actions/checkout@v4
+      - name: First Composite Action
+        run: |
+          echo "new upload files" >> new.txt
 
-  cleanup:
-    needs: build-and-upload
-    strategy:
-      matrix:
-        include:
-          - env: dev
-            branch: master
-            storageAccountName: "devstorageaccount"
-            frontdoorName: "dev-frontdoor"
-            frontdoorRG: "dev-rg"
-            endpointName: "dev-endpoint"
-            domainName: "dev.domain.com"
-          - env: staging
-            branch: master2
-            storageAccountName: "stagingstorageaccount"
-            frontdoorName: "staging-frontdoor"
-            frontdoorRG: "staging-rg"
-            endpointName: "staging-endpoint"
-            domainName: "staging.domain.com"
-          - env: production
-            branch: master3
-            storageAccountName: "prodstorageaccount"
-            frontdoorName: "prod-frontdoor"
-            frontdoorRG: "prod-rg"
-            endpointName: "prod-endpoint"
-            domainName: "prod.domain.com"
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ env.BUILD_NUMBER }}
+          path: /
+          retention-days: 2
 
+  downlaod:
+    runs-on: ubuntu-latest
+    name: Download
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      
     steps:
-      - name: Conditional Build & Upload
-        if: |
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch) ||
-          (github.event_name == 'push' && github.ref_name == matrix.branch)
-        uses: anujrajkumar/template/.github/workflows/blank.yml@main
+      - uses: actions/checkout@v4
+
+      - name: Download Code Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact-${{ env.BUILD_NUMBER }}
+          path: /
+
+      - name: List
+        run: |
+          ls -ltr
+          cat new.txt
