@@ -122,7 +122,7 @@ jobs:
           retention-days: 2
 
   downlaod1:
-    needs: build-and-upload 
+    needs: build-and-upload1
     
     runs-on: ubuntu-latest
     name: Download1
