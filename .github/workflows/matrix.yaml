@@ -23,13 +23,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: First Composite Action
         run: |
-          echo "new upload files" >> new.txt
+          echo "new upload files" >> dist/p-one-ad-b2c-test/browser/new.txt
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ env.BUILD_NUMBER }}
-          path: ${{ github.run_number }}/dist/p-one-ad-b2c-test/browser
+          path: ${{ github.run_number }}/artifact/dist/p-one-ad-b2c-test/browser
           retention-days: 2
 
   downlaod:
@@ -45,7 +45,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: artifact-${{ env.BUILD_NUMBER }}
-          path: /
+          path: /artifact
 
       - name: List
         run: |
