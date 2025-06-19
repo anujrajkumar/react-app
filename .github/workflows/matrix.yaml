@@ -58,9 +58,74 @@ jobs:
 
   downlaod:
     needs: build-and-upload 
-    if: ${{ github.ref_name != 'master' }}
     runs-on: ubuntu-latest
     name: Download
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Code Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact-${{ env.BUILD_NUMBER }}
+          path:  ${{ github.workspace }}/dist/p-one-ad-b2c-test/browser
+
+      - name: List
+        run: |
+          ls -ltr
+          cd dist/p-one-ad-b2c-test/browser/
+          cat new.txt
+
+  build-and-upload1:
+    if: ${{ github.ref_name == 'master2' }}
+    runs-on: ubuntu-latest
+    name: A job to say hello1
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set deployment start time
+        id: set-deploy-time
+        run: |
+          echo "Setting deployment start time..."
+          echo "deploy_start_time=$(date -u +%s)" >> $GITHUB_OUTPUT
+
+      - name: Set deployment start time
+        id: time
+        run: |
+          end_time=$(date -u +%s)
+          echo "Current time: $end_time"
+
+          deploy_start_time=${{ steps.set-deploy-time.outputs.deploy_start_time }}
+          echo "Deployment start time: $deploy_start_time"
+
+          elapsed_time=$((end_time - deploy_start_time))
+          echo "Deployment duration: $elapsed_time seconds"
+
+          olddate=$(date -u -d "$elapsed_time seconds ago" '+%Y-%m-%dT%H:%MZ')
+          echo "Deleting files unmodified since: $olddate"
+          
+      - name: First Composite Action
+        run: |
+          mkdir -p dist/p-one-ad-b2c-test/browser
+          echo "new upload files" >> dist/p-one-ad-b2c-test/browser/new.txt
+          ls -ltr
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ env.BUILD_NUMBER }}
+          path: ${{ github.workspace }}/dist/p-one-ad-b2c-test/browser
+          retention-days: 2
+
+  downlaod1:
+    needs: build-and-upload 
+    
+    runs-on: ubuntu-latest
+    name: Download1
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       
