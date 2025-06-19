@@ -25,12 +25,13 @@ jobs:
         run: |
           mkdir -p dist/p-one-ad-b2c-test/browser
           echo "new upload files" >> dist/p-one-ad-b2c-test/browser/new.txt
+          ls -ltr
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ env.BUILD_NUMBER }}
-          path: ${{ github.run_number }}/dist/p-one-ad-b2c-test/browser
+          path: ${{ github.workspace }}/dist/p-one-ad-b2c-test/browser
           retention-days: 2
 
   downlaod:
