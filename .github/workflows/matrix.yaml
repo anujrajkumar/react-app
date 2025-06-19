@@ -23,6 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: First Composite Action
         run: |
+          mkdir -p dist/p-one-ad-b2c-test/browser
           echo "new upload files" >> dist/p-one-ad-b2c-test/browser/new.txt
 
       - name: Upload build artifact
