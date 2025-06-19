@@ -21,6 +21,27 @@ jobs:
       
     steps:
       - uses: actions/checkout@v4
+      - name: Set deployment start time
+        id: set-deploy-time
+        run: |
+          echo "Setting deployment start time..."
+          echo "deploy_start_time=$(date -u +%s)" >> $GITHUB_OUTPUT
+
+      - name: Set deployment start time
+        id: time
+        run: |
+          end_time=$(date -u +%s)
+          echo "Current time: $end_time"
+
+          deploy_start_time=${{ steps.set-deploy-time.outputs.deploy_start_time }}
+          echo "Deployment start time: $deploy_start_time"
+
+          elapsed_time=$((end_time - deploy_start_time))
+          echo "Deployment duration: $elapsed_time seconds"
+
+          olddate=$(date -u -d "$elapsed_time seconds ago" '+%Y-%m-%dT%H:%MZ')
+          echo "Deleting files unmodified since: $olddate"
+          
       - name: First Composite Action
         run: |
           mkdir -p dist/p-one-ad-b2c-test/browser
