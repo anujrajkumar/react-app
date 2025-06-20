@@ -16,12 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: First Composite Action
-        uses: anujrajkumar/template/custom@main
+        uses: anujrajkumar/template/.github/actions/custom@main
         with:
           run_condition: 'true'
           
       - name: Second Composite Action
-        uses: anujrajkumar/template/custom2@main
+        uses: anujrajkumar/template/.github/actions/custom2@main
         with:
           run_condition: 'true'
           
