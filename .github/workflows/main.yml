@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref }
+          ref: ${{ github.event.inputs.ref }}
       - name: First Composite Action
         uses: anujrajkumar/template/.github/actions/custom@main
         with:
