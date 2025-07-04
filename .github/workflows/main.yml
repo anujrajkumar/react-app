@@ -5,6 +5,10 @@ permissions:
   pull-requests: write
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+      description: 'Git ref (branch, tag, or commit SHA)'
+      required: true
   push:
     branches:
       - master
