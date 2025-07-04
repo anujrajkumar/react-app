@@ -7,8 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-      description: 'Git ref (branch, tag, or commit SHA)'
-      required: true
+        description: 'Git ref (branch, tag, or commit SHA)'
+        required: false
+        default: ""
   push:
     branches:
       - master
