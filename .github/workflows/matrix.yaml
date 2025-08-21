@@ -32,6 +32,6 @@ jobs:
           git commit -m "Bot commit"
 
       - name: Push directly to dev
-        run: git push origin HEAD:dev
+        run: git push origin HEAD:master
         env:
           GITHUB_TOKEN: ${{ steps.auth.outputs.token }}
