@@ -1,37 +1,34 @@
-name: Push Direct to Dev
+name: Push to Dev Branch
 
 on:
   workflow_dispatch:
 
 jobs:
-  push:
+  push-dev:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          persist-credentials: false # we'll use the app instead
+          persist-credentials: false   # important
 
-      - name: Authenticate as GitHub App
-        id: auth
-        uses: tibdex/github-app-token@v2
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
         with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
-          installation_id: ${{ secrets.INSTALLATION_ID }}
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          installation-id: ${{ secrets.APP_INSTALLATION_ID }}
 
-      - name: Configure Git
+      - name: Configure git
         run: |
-          git config user.name "prypco-deploy-bot[bot]"
-          git config user.email "prypco-deploy-bot[bot]@users.noreply.github.com"
+          git config user.name "my-github-app[bot]"
+          git config user.email "12345+my-github-app[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
 
-      - name: Make a change
+      - name: Make changes
         run: |
-          echo "Hello $(date)" >> hello.txt
-          git add hello.txt
-          git commit -m "Bot commit"
-
-      - name: Push directly to dev
-        run: git push origin HEAD:master
-        env:
-          GITHUB_TOKEN: ${{ steps.auth.outputs.token }}
+          echo "new file $(date)" >> myfile.txt
+          git add myfile.txt
+          git commit -m "Auto commit from GitHub App"
+          git push origin master
