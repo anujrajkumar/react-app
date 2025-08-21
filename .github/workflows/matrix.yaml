@@ -3,6 +3,10 @@ name: Push to Dev Branch
 on:
   workflow_dispatch:
 
+permissions:
+  pull-requests: write
+  contents: write
+
 jobs:
   push-dev:
     runs-on: ubuntu-latest
@@ -18,7 +22,6 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.PRIVATE_KEY }}
-          installation-id: ${{ secrets.INSTALLATION_ID }}
 
       - name: Configure git
         run: |
