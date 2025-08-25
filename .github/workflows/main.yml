@@ -31,5 +31,3 @@ jobs:
         uses: anujrajkumar/template/.github/actions/custom2@main
         with:
           run_condition: 'true'
-          
-      - run: echo "This is invalid"
