@@ -16,18 +16,5 @@ on:
 
 jobs:
   hello_world_job:
-    runs-on: ubuntu-latest
     name: A job to say hello
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.ref }}
-      - name: First Composite Action
-        uses: anujrajkumar/template/.github/workflows/new.yaml@v0.0.2
-        with:
-          run_condition: 'true'
-          
-      - name: Second Composite Action
-        uses: anujrajkumar/template/.github/actions/custom2@main
-        with:
-          run_condition: 'true'
+    uses: anujrajkumar/template/.github/workflows/new.yaml@v0.0.2
