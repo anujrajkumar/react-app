@@ -23,7 +23,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.ref }}
       - name: First Composite Action
-        uses: anujrajkumar/template/.github/actions/custom@main
+        uses: anujrajkumar/template/.github/workflows/new.yaml@v0.0.2
         with:
           run_condition: 'true'
           
