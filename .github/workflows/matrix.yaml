@@ -15,6 +15,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: true   # important
+          
+      - name: Use of Custom action
+        uses: anujrajkumar/template/actions/custom@v0.0.5
 
       - name: Generate GitHub App token
         id: app-token
