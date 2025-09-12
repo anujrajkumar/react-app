@@ -17,7 +17,7 @@ jobs:
           persist-credentials: true   # important
           
       - name: Use of Custom action
-        uses: anujrajkumar/template/.github/actions/custom@v0.0.22
+        uses: anujrajkumar/template/.github/actions/custom@v0.0.23
 
       - name: Generate GitHub App token
         id: app-token
